@@ -7,7 +7,7 @@ function Form({ value, onChange, onClick, content }) {
         type="text"
         value={value}
         onChange={onChange}
-        placeholder="Nombre de la película"
+        placeholder="Movie's title"
       />
       <button onClick={onClick}>{content}</button>
     </>
