@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import Input from "../components/Form";
-import Button from "../components/Button";
 import Header from "../components/Header";
 import Emoji from "../components/Emojis";
 import Form from "../components/Form";
