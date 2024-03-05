@@ -50,6 +50,7 @@ function MovieViewer() {
           alert("Game Over");
           setCurrentIndex(0);
           setLives(3);
+          setInputValue("");
         }
       }
     }
