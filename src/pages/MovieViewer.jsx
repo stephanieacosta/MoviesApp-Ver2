@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Emoji from "../components/Emojis";
 import Form from "../components/Form";
+import useCounter from "../hooks/useCounter";
 
 const movies = [
   { name: "Forrest Gump", emoji: "🏃🍫🍤" },
@@ -27,31 +28,44 @@ const movies = [
 ];
 
 function MovieViewer() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentMovie, setCurrentMovie] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
-  const [lives, setLives] = useState(3);
-  const [points, setPoints] = useState(0);
+
+  const { points, lives, increasePoints, decreaseLives, resetGame } =
+    useCounter();
+
+  const selectRandomMovie = () => {
+    const randomIndex = Math.floor(Math.random() * movies.length);
+    const selectedMovie = movies[randomIndex];
+    setCurrentMovie(selectedMovie);
+    // Eliminar la película seleccionada del array, para que no se repita
+    movies.splice(randomIndex, 1);
+  };
+
+  useEffect(() => {
+    selectRandomMovie();
+  }, []);
 
   const displayNextMovie = () => {
-    if (currentIndex < movies.length) {
-      if (
-        inputValue.toLowerCase() === movies[currentIndex].name.toLowerCase()
-      ) {
-        setCurrentIndex(currentIndex + 1);
-        setError("");
-        setInputValue("");
-        setPoints(points + 1);
+    if (inputValue.toLowerCase() === currentMovie.name.toLowerCase()) {
+      increasePoints();
+      setError("");
+      setInputValue("");
+      if (movies.length > 0) {
+        selectRandomMovie();
       } else {
-        setError("Nombre de película incorrecto.");
-        setLives(lives - 1);
-        if (lives === 1) {
-          setPoints(0);
-          alert("Game Over");
-          setCurrentIndex(0);
-          setLives(3);
-          setInputValue("");
-        }
+        alert("¡Felicidades! Has adivinado todas las películas");
+      }
+    } else {
+      setError("Nombre de película incorrecto.");
+      decreaseLives();
+      if (lives === 1) {
+        resetGame();
+        alert("Game Over");
+        selectRandomMovie();
+        setInputValue("");
+        setError("");
       }
     }
   };
@@ -61,9 +75,9 @@ function MovieViewer() {
       <Header points={points} lives={lives} />
       <div className="movie-container">
         <h1 className="title">Guess the movie</h1>
-        {currentIndex < movies.length ? (
+        {currentMovie ? (
           <div>
-            <Emoji emoji={movies[currentIndex].emoji} />
+            <Emoji emoji={currentMovie.emoji} />
             <div className="form">
               <Form
                 value={inputValue}
@@ -75,16 +89,7 @@ function MovieViewer() {
             {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
         ) : (
-          <p
-            style={{
-              color: "white",
-              textAlign: "center",
-              fontWeight: "600",
-              fontSize: "1.5rem",
-            }}
-          >
-            No hay más películas.
-          </p>
+          <p>No hay más películas.</p>
         )}
       </div>
     </div>
